@@ -11,6 +11,6 @@ class Base(DeclarativeBase):
 engine = create_engine(
     settings.database_url,
     future=True,
-    connect_args={"sslmode": "require"},
+    connect_args={"sslmode": "require", "prepare_threshold": None},
 )
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, future=True)
