@@ -1,4 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.config import settings
@@ -32,7 +34,11 @@ def root() -> dict:
 
 
 @router.get("/health", response_model=HealthResponse, summary="Health check")
-def health() -> HealthResponse:
+def health(db: Session = Depends(get_db)) -> HealthResponse:
+    try:
+        db.execute(text("SELECT 1"))
+    except SQLAlchemyError as exc:
+        raise HTTPException(status_code=503, detail="Database health check failed.") from exc
     return HealthResponse(status="ok")
 
 
